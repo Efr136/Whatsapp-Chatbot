@@ -1,0 +1,741 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        48,
+        128
+      ],
+      "id": "60f56b17-2121-4984-a795-35fa82c24d4a",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "UMGsNF4AvVLqhxWn",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Chat Recieved').item.json.contacts[0].wa_id }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        144,
+        128
+      ],
+      "id": "0ab9eaa3-d49d-455a-9a3b-7e7528d2a0d8",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "messages"
+        ],
+        "options": {
+          "messageStatusUpdates": []
+        }
+      },
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "typeVersion": 1,
+      "position": [
+        -944,
+        -304
+      ],
+      "id": "023729ae-8915-4b86-abed-03f9788a26ca",
+      "name": "Chat Recieved",
+      "webhookId": "6091c8ef-126a-4c5a-946b-6d9dd42d5cfb",
+      "credentials": {
+        "whatsAppTriggerApi": {
+          "id": "3iVFL2gXPpg3ZdDT",
+          "name": "WhatsApp OAuth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "9d046089-ebe4-4d4b-a951-1962342aba12",
+              "leftValue": "={{ $json.data.approved }}",
+              "rightValue": "=",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        608,
+        -80
+      ],
+      "id": "63b01f4a-a2a3-4310-a1ef-9c89f20bbda6",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You just got the problem form the client and now have to describe the problem to the Housekeeper. {{ $('Chat Recieved').item.json.messages[0].text.body }}  explain it in english to the housekeeper. Also provide him with the number of the customer which is: {{ $('Chat Recieved').item.json.messages[0].from }} You should expalin it directly, not giving me an explanaition of how to explain it.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        976,
+        -288
+      ],
+      "id": "62b2544b-c721-4d17-854c-33ff9c01aab4",
+      "name": "Response to housekeeper"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        976,
+        -112
+      ],
+      "id": "255f7641-4b89-4d79-ac82-42008c144db0",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "UMGsNF4AvVLqhxWn",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Chat Recieved').item.json.contacts[0] }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1072,
+        -112
+      ],
+      "id": "74993ec5-0ec2-4cc4-81d3-ad3746f5e582",
+      "name": "Simple Memory1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6a2e3fe8-0cf5-4b9e-9d34-7730e4767ca6",
+              "name": "Housekeeper_Number",
+              "value": "4917647338875",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        816,
+        -288
+      ],
+      "id": "ca96d5d8-3618-47a9-923a-c492d11e1ce0",
+      "name": "Set Housekeeper Number"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        784,
+        224
+      ],
+      "id": "a07684d7-fbf2-4b8f-b32b-40cb5d402e0b",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "UMGsNF4AvVLqhxWn",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Chat Recieved').item.json.contacts[0] }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        912,
+        224
+      ],
+      "id": "28e18bb2-b74e-4828-b705-735eccecbfc8",
+      "name": "Simple Memory2"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -672,
+        -96
+      ],
+      "id": "785df897-49df-460f-ae08-3021dda47ef2",
+      "name": "OpenAI Chat Model3",
+      "credentials": {
+        "openAiApi": {
+          "id": "UMGsNF4AvVLqhxWn",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.contacts[0] }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -576,
+        -96
+      ],
+      "id": "41ef639b-5173-4ae9-8b15-8bc45fc29339",
+      "name": "Simple Memory3"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        32,
+        -400
+      ],
+      "id": "0bc7b3fa-5746-49ec-899f-5d87cf688110",
+      "name": "OpenAI Chat Model4",
+      "credentials": {
+        "openAiApi": {
+          "id": "UMGsNF4AvVLqhxWn",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Chat Recieved').item.json.contacts[0] }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        128,
+        -400
+      ],
+      "id": "89437e4e-00a9-4af5-b534-8adfde6cf253",
+      "name": "Simple Memory4"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b42b07ed-76d1-4897-ade2-034057887b54",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "false",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -320,
+        -304
+      ],
+      "id": "19a9c645-8efa-4bea-8116-45aa5268088f",
+      "name": "Problem?"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You're a helping ai for appartment managers. Your task is to help the client with his issue and ask him if he'd like to make a request to the housekeeper about the issue. Awnser in the same language as your client, they ususally speak maltese, english, german or italaian. try to really be sure which language is the right one. When asking him if he wants to report his issue, make sure that you once again repeat his issue so that he knows you understood it correctly. This is the issue: {{ $json.output }} ",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        48,
+        -80
+      ],
+      "id": "fdd1339e-c6e4-473a-8982-02bca26f16ca",
+      "name": "Generate Answer"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You're a Housekeeper assistance AI and a customer has just messaged you: ( {{ $json.messages[0].text.body }}) Your Task is to classify the message as either a request (for example: Hey, my lightbulb is broken) or something else like a greeting. You should give out false if iits not discussing a problem dircetly. If a problem is being subscribed you should give out the message that the cleint sent you. no need to give out a \"true\" message",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -672,
+        -304
+      ],
+      "id": "8909804b-0f5a-4469-98bf-4fd9f8493b6c",
+      "name": "Problem reported?"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You're a Housekeeper assistance AI and a customer has just messaged you: ( {{ $('Chat Recieved').item.json.messages[0].text.body }} ) You should answer in the same language as your customer. Respond properly to your customer and ask kindly if there is a problem with his/hers apartment. You can also answer on his message, for example (Hey how are you doing? --> you awnser \"im doing good how about you?\") and then also do all that stuff that i told you before. Respond maybe with a question regarding the topic the customer talked about.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        32,
+        -576
+      ],
+      "id": "f58a4f3b-a86b-4680-af86-5bab725e317b",
+      "name": "Ask for problem"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "801234416414103",
+        "recipientPhoneNumber": "={{ $('Chat Recieved').item.json.contacts[0].wa_id }}",
+        "textBody": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        384,
+        -576
+      ],
+      "id": "3ceb60e8-0591-4dba-b01e-2c1bb97c20c4",
+      "name": "Send question",
+      "webhookId": "bffe8e0e-f62b-4192-aaac-cc99bc33866d",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "iPDWBHcxoDZnTtVH",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "phoneNumberId": "801234416414103",
+        "recipientPhoneNumber": "={{ $('Chat Recieved').item.json.contacts[0].wa_id }}",
+        "message": "={{ $json.output }}",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        400,
+        -80
+      ],
+      "id": "d1cc4d41-1caa-476b-a2c5-0ca5c480c04c",
+      "name": "Ask if contact is required",
+      "webhookId": "8fd259a7-89e9-483d-abee-f992c0601250",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "iPDWBHcxoDZnTtVH",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "801234416414103",
+        "recipientPhoneNumber": "={{ $('Set Housekeeper Number').item.json.Housekeeper_Number }}",
+        "textBody": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        1328,
+        -288
+      ],
+      "id": "d53f52b3-5c45-48dc-81e6-6e9e547a62f6",
+      "name": "Message to Housekeeper",
+      "webhookId": "8c484da7-9876-4285-ad45-3782c2384c0e",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "iPDWBHcxoDZnTtVH",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You just got this info from your client:  {{ $('Chat Recieved').item.json.messages[0].text.body }} now your task is to awnser that you will NOT message a housekeeper about this issue and you thank the customer for using your service. You will NOT message the housekeeper (as the customer requested) thats very important.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        800,
+        16
+      ],
+      "id": "87b639cf-b0ee-4e06-88e8-265c4b629e29",
+      "name": "Generate decline answer",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "801234416414103",
+        "recipientPhoneNumber": "={{ $('Chat Recieved').item.json.contacts[0].wa_id }}",
+        "textBody": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        1136,
+        16
+      ],
+      "id": "4139135a-4229-4e82-888a-52668c83ce72",
+      "name": "Send answer",
+      "webhookId": "7eb9e885-ff3d-4240-a499-c43bc608c07b",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "iPDWBHcxoDZnTtVH",
+          "name": "WhatsApp account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generate Answer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Generate Answer",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chat Recieved": {
+      "main": [
+        [
+          {
+            "node": "Problem reported?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Set Housekeeper Number",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Generate decline answer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Response to housekeeper": {
+      "main": [
+        [
+          {
+            "node": "Message to Housekeeper",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Response to housekeeper",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "Response to housekeeper",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Housekeeper Number": {
+      "main": [
+        [
+          {
+            "node": "Response to housekeeper",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generate decline answer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory2": {
+      "ai_memory": [
+        [
+          {
+            "node": "Generate decline answer",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Problem reported?",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory3": {
+      "ai_memory": [
+        [
+          {
+            "node": "Problem reported?",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Ask for problem",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory4": {
+      "ai_memory": [
+        [
+          {
+            "node": "Ask for problem",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Problem?": {
+      "main": [
+        [
+          {
+            "node": "Ask for problem",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Generate Answer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Answer": {
+      "main": [
+        [
+          {
+            "node": "Ask if contact is required",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Problem reported?": {
+      "main": [
+        [
+          {
+            "node": "Problem?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ask for problem": {
+      "main": [
+        [
+          {
+            "node": "Send question",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ask if contact is required": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate decline answer": {
+      "main": [
+        [
+          {
+            "node": "Send answer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send answer": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f739f2b1-219b-43cf-9af1-98eb642b0082",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "59724686b68c3b2476621f8bd9292893ed972d6fb155d8cec99d45e6f5960e86"
+  },
+  "id": "RJb2thZKeWbsTJsD",
+  "tags": []
+}
